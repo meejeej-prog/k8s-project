@@ -12,6 +12,19 @@ spec:
   podSpec:
     containers:
     - name: mysql
+      # TimeOut 최적화
+      readinessProbe:
+        exec:
+          command: ["/readinessprobe.sh"]
+        initialDelaySeconds: 30
+        periodSeconds: 10
+        timeoutSeconds: 10
+      livenessProbe:
+        exec:
+          command: ["/livenessprobe.sh"]
+        initialDelaySeconds: 60
+        periodSeconds: 20
+        timeoutSeconds: 10
       volumeMounts:
       - name: init-sql
         mountPath: /docker-entrypoint-initdb.d
