@@ -4,24 +4,21 @@ metadata:
   name: mysql-cluster
 spec:
   secretName: secret
-  instances: 3 # 3-node HA
+  instances: 3
   router:
-    instances: 1 # Router 1개
+    instances: 1
+  tlsUseSelfSigned: true
 
-  # configMap 설정
+  # Pod 설정 최적화
   podSpec:
     containers:
     - name: mysql
-      # TimeOut 최적화
+      # 오퍼레이터가 관리하는 기본 프로브를 덮어쓰게 됩니다.
       readinessProbe:
-        exec:
-          command: ["/readinessprobe.sh"]
         initialDelaySeconds: 30
         periodSeconds: 10
         timeoutSeconds: 10
       livenessProbe:
-        exec:
-          command: ["/livenessprobe.sh"]
         initialDelaySeconds: 60
         periodSeconds: 20
         timeoutSeconds: 10
@@ -33,10 +30,11 @@ spec:
       configMap:
         name: mysql-configmap
 
-  tlsUseSelfSigned: true
+  # PVC 템플릿 (spec 추가됨)
   datadirVolumeClaimTemplate:
-    storageClassName: manual
-    accessModes: [ "ReadWriteOnce" ]
-    resources:
-      requests:
-        storage: 5G # 각 노드 당 2G 디스크
+    spec:
+      storageClassName: manual
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 5G
