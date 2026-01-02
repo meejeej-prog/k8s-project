@@ -1,0 +1,29 @@
+apiVersion: mysql.oracle.com/v2
+kind: InnoDBCluster
+metadata:
+  name: mysql-cluster
+spec:
+  secretName: secret
+  instances: 3 # 3-node HA
+  router:
+    instances: 1 # Router 1개
+
+  # configMap 설정
+  podSpec:
+    containers:
+    - name: mysql
+      volumeMounts:
+      - name: init-sql
+        mountPath: /docker-entrypoint-initdb.d
+    volumes:
+    - name: init-sql
+      configMap:
+        name: mysql-configmap
+
+  tlsUseSelfSigned: true
+  datadirVolumeClaimTemplate:
+    storageClassName: manual
+    accessModes: [ "ReadWriteOnce" ]
+    resources:
+      requests:
+        storage: 5G # 각 노드 당 2G 디스크

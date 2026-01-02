@@ -1,0 +1,51 @@
+<main>
+  <h2>시험 결과를 확인하세요</h2>
+
+  <form id="exam-result-form">
+    <label for="exam-type">자격증 시험 선택</label>
+    <select id="exam-type" name="exam-type" required>
+      <option value="">-- 선택 --</option>
+      <option value="it-certificate">IT 자격증</option>
+      <option value="language-certificate">어학 자격증</option>
+      <option value="finance-certificate">금융 자격증</option>
+    </select>
+
+    <label for="name">이름</label>
+    <input type="text" id="name" name="name" placeholder="홍길동" required>
+
+    <label for="birthdate">생년월일</label>
+    <input type="date" id="birthdate" name="birthdate" required>
+
+    <button type="submit">결과 조회</button>
+  </form>
+
+  <div id="result" style="margin-top:20px; display:none;"></div>
+</main>
+
+<script>
+const form = document.getElementById('exam-result-form');
+form.addEventListener('submit', async function(e) {
+  e.preventDefault();
+
+  const examCategory = document.getElementById('exam-type').value;
+  const name = document.getElementById('name').value;
+  const birth = document.getElementById('birthdate').value;
+
+  try {
+    const res = await fetch(`/result/data?exam_category=${examCategory}&name=${name}&birth=${birth}`);
+    if(!res.ok) throw new Error('결과를 조회할 수 없습니다.');
+    const data = await res.json();
+
+    const div = document.getElementById('result');
+    div.style.display = 'block';
+    div.innerHTML = `
+      <p><strong>이름:</strong> ${data.name}</p>
+      <p><strong>시험:</strong> ${data.exam_category} - ${data.exam_name}</p>
+      <p><strong>결과:</strong> ${data.result}</p>
+    `;
+  } catch(err) {
+    alert(err.message);
+  }
+});
+</script>
+

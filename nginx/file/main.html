@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>Exam Service</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background-color: #f5f7fa;
+      color: #333;
+    }
+
+    header {
+      background-color: #1f2937;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+
+    main {
+      max-width: 900px;
+      margin: 60px auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 30px;
+      padding: 0 20px;
+    }
+
+    .card {
+      background-color: white;
+      border-radius: 12px;
+      padding: 30px;
+      text-align: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+      transition: transform 0.2s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+    }
+
+    .card h2 {
+      margin-bottom: 15px;
+    }
+
+    .card p {
+      margin-bottom: 25px;
+      color: #555;
+    }
+
+    .card a {
+      display: inline-block;
+      padding: 10px 20px;
+      background-color: #2563eb;
+      color: white;
+      text-decoration: none;
+      border-radius: 6px;
+      font-weight: bold;
+    }
+
+    .card a:hover {
+      background-color: #1e40af;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 80px;
+      padding: 20px;
+      color: #777;
+      font-size: 14px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <h1>Online Exam Service</h1>
+    <p>시험 접수 · 시험 정보 · 시험 결과</p>
+  </header>
+
+  <main>
+    <!-- 시험 접수 -->
+    <div class="card">
+      <h2>Apply</h2>
+      <p>시험 접수를 진행합니다.</p>
+      <a href="/apply">Go to Apply</a>
+    </div>
+
+    <!-- 시험 정보 -->
+    <div class="card">
+      <h2>Schedule</h2>
+      <p>시험 일정 및 정보를 확인합니다.</p>
+      <a href="/schedule">View Schedule</a>
+    </div>
+
+    <!-- 시험 결과 -->
+    <div class="card">
+      <h2>Results</h2>
+      <p>시험 결과를 조회합니다.</p>
+      <a href="/results">Check Results</a>
+    </div>
+  </main>
+
+  <footer>
+    © 2025 Exam Service | Cloud & Kubernetes Project
+  </footer>
+
+</body>
+</html>
+

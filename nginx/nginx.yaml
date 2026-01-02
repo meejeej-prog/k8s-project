@@ -1,0 +1,187 @@
+# NameSpace
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: nginx-ingress
+---
+
+# Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: main-nginx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: main-nginx
+  template:
+    metadata:
+      labels:
+        app: main-nginx
+    spec:
+      containers:
+       - name: main-nginx
+         image: jiwon888/main-nginx:1.1 
+         imagePullPolicy: IfNotPresent
+         ports:
+         - containerPort: 80
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: apply-nginx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: apply-nginx
+  template:
+    metadata:
+      labels:
+        app: apply-nginx
+    spec:
+      containers: 
+       - name: apply-nginx
+         image: nginx:1.29.3-alpine
+         imagePullPolicy: IfNotPresent
+         ports:
+         - containerPort: 80
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: result-nginx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: result-nginx
+  template:
+    metadata:
+      labels:
+        app: result-nginx
+    spec: 
+      containers:
+      - name: apply-nginx
+        image: nginx:1.29.3-alpine
+        imagePullPolicy: Always 
+        ports:
+        - containerPort: 80
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: schedule-nginx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: schedule-nginx
+  template:
+    metadata:
+      labels:
+        app: schedule-nginx
+    spec: 
+      containers:
+      - name: apply-nginx
+        image: nginx:1.29.3-alpine
+        imagePullPolicy: Always 
+        ports:
+        - containerPort: 80
+---
+# Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: main-nginx-svc
+spec:
+  type: ClusterIP
+  selector:
+    app: main-nginx
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: apply-nginx-svc
+spec:
+  type: ClusterIP
+  selector:
+    app: apply-nginx
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: result-nginx-svc
+spec:
+  type: ClusterIP
+  selector:
+    app: result-nginx
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: schedule-nginx-svc
+spec:
+  type: ClusterIP
+  selector:
+    app: schedule-nginx
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+
+---
+# Ingress
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: nginx-ingress
+  namespace: default
+spec:
+  ingressClassName: nginx
+  rules:
+  - http:
+      paths:
+      - pathType: Prefix
+        path: /
+        backend:
+          service:
+            name: main-nginx-svc
+            port:
+              number: 80
+      - pathType: Prefix
+        path: /apply
+        backend:
+          service:
+            name: apply-fastapi-service
+            port:
+              number: 80
+      - pathType: Prefix
+        path: /result
+        backend:
+          service:
+            name: result-fastapi-service
+            port:
+              number: 80
+      - pathType: Prefix
+        path: /schedule
+        backend:
+          service:
+            name: schedule-fastapi-service
+            port:
+              number: 80

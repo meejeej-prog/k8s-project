@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>자격증 시험 신청</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { margin: 0; font-family: Arial, Helvetica, sans-serif; background-color: #f5f7fa; color: #333; }
+    header { background-color: #1f2937; color: white; padding: 20px; text-align: center; }
+    main { max-width: 500px; margin: 60px auto; background-color: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.08); }
+    h2 { text-align: center; margin-bottom: 30px; }
+    label { display: block; margin-top: 15px; font-weight: bold; }
+    input, select { width: 100%; padding: 10px; margin-top: 5px; border-radius: 6px; border: 1px solid #ccc; box-sizing: border-box; }
+    button { margin-top: 30px; width: 100%; padding: 12px; background-color: #2563eb; color: white; border: none; border-radius: 6px; font-size: 16px; cursor: pointer; }
+    button:hover { background-color: #1e40af; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>자격증 시험 신청</h1>
+</header>
+
+<main>
+  <h2>시험 신청 정보를 입력하세요</h2>
+
+  <form id="exam-apply-form" method="post">
+    <label for="category">카테고리 선택</label>
+    <select id="category" name="category" required>
+      <option value="">-- 선택 --</option>
+    </select>
+
+    <label for="exam-name">자격증 선택</label>
+    <select id="exam-name" name="exam_name" required>
+      <option value="">-- 선택 --</option>
+    </select>
+
+    <label for="name">이름</label>
+    <input type="text" id="name" name="name" placeholder="홍길동" required>
+
+    <label for="birthdate">생년월일</label>
+    <input type="date" id="birthdate" name="birthdate" required>
+
+    <button type="submit">신청 완료</button>
+  </form>
+
+  <div id="result" style="margin-top:20px;"></div>
+</main>
+
+<script>
+async function fetchCategories() {
+    const res = await fetch('/apply/categories');
+    const data = await res.json();
+    const categorySelect = document.getElementById('category');
+    data.forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c;
+        opt.text = c;
+        categorySelect.appendChild(opt);
+    });
+}
+
+document.getElementById('category').addEventListener('change', async function() {
+    const res = await fetch(`/apply/exams?category=${this.value}`);
+    const exams = await res.json();
+    const examSelect = document.getElementById('exam-name');
+    examSelect.innerHTML = '<option value="">-- 선택 --</option>';
+    exams.forEach(e => {
+        const opt = document.createElement('option');
+        opt.value = e;
+        opt.text = e;
+        examSelect.appendChild(opt);
+    });
+});
+
+document.getElementById('exam-apply-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const formData = new FormData(this);
+    const res = await fetch('/apply', {
+        method: 'POST',
+        body: formData
+    });
+    const result = await res.json();
+    document.getElementById('result').innerHTML = `
+        <h3>신청 완료!</h3>
+        <p>카테고리: ${result.category}</p>
+        <p>자격증: ${result.exam_name}</p>
+        <p>이름: ${result.name}</p>
+        <p>생년월일: ${result.birthdate}</p>
+    `;
+    this.reset();
+});
+
+fetchCategories();
+</script>
+
+</body>
+</html>
+

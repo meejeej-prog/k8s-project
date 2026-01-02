@@ -1,0 +1,26 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: mysql-sidecar-viewer-role
+rules:
+- apiGroups: [""]
+  resources: ["namespaces"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["apiextensions.k8s.io"]
+  resources: ["customresourcedefinitions"]
+  verbs: ["get", "list", "watch"]
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: mysql-sidecar-viewer-binding
+subjects:
+- kind: ServiceAccount
+  name: mysql-cluster-sidecar-sa
+  namespace: default
+roleRef:
+  kind: ClusterRole
+  name: mysql-sidecar-viewer-role
+  apiGroup: rbac.authorization.k8s.io

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>시험 일정 확인</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { margin:0; font-family:Arial, Helvetica, sans-serif; background:#f5f7fa; color:#333; }
+    header { background:#1f2937; color:#fff; padding:20px; text-align:center; }
+    main { max-width:500px; margin:60px auto; background:#fff; padding:40px; border-radius:12px; box-shadow:0 4px 10px rgba(0,0,0,.08); }
+    h2 { text-align:center; margin-bottom:30px; }
+    label { display:block; margin-top:15px; font-weight:bold; }
+    select, button { width:100%; padding:10px; margin-top:5px; border-radius:6px; border:1px solid #ccc; }
+    button { margin-top:30px; background:#2563eb; color:#fff; border:none; font-size:16px; cursor:pointer; }
+    button:hover { background:#1e40af; }
+    .result { margin-top:30px; background:#e0f2fe; padding:20px; border-radius:8px; font-size:14px; line-height:1.6; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>시험 일정 확인</h1>
+</header>
+
+<main>
+  <h2>시험 일정을 확인하세요</h2>
+
+  <form id="schedule-form">
+    <label>카테고리</label>
+    <select id="category" required>
+      <option value="">-- 선택 --</option>
+    </select>
+
+    <label>자격증</label>
+    <select id="exam" required>
+      <option value="">-- 선택 --</option>
+    </select>
+
+    <button type="submit">일정 확인</button>
+  </form>
+
+  <div id="result" class="result" style="display:none;"></div>
+</main>
+
+<script>
+async function loadCategories() {
+  const res = await fetch('/apply/categories');
+  const data = await res.json();
+  const sel = document.getElementById('category');
+  data.forEach(c => {
+    const o = document.createElement('option');
+    o.value = c;
+    o.text = c;
+    sel.appendChild(o);
+  });
+}
+
+document.getElementById('category').addEventListener('change', async function() {
+  const res = await fetch(`/apply/exams?category=${this.value}`);
+  const exams = await res.json();
+  const sel = document.getElementById('exam');
+  sel.innerHTML = '<option value="">-- 선택 --</option>';
+  exams.forEach(e => {
+    const o = document.createElement('option');
+    o.value = e;
+    o.text = e;
+    sel.appendChild(o);
+  });
+});
+
+document.getElementById('schedule-form').addEventListener('submit', async function(e) {
+  e.preventDefault();
+
+  const category = document.getElementById('category').value;
+  const exam = document.getElementById('exam').value;
+
+  const res = await fetch(`/schedule/data?category=${category}&exam_name=${exam}`);
+  const data = await res.json();
+
+  const div = document.getElementById('result');
+  div.style.display = 'block';
+  div.innerHTML = `
+    <p><strong>접수 기간:</strong> ${data.registration_period.start} ~ ${data.registration_period.end}</p>
+    <p><strong>시험 일시:</strong> ${data.exam_time.start} ~ ${data.exam_time.end}</p>
+    <p><strong>결과 발표:</strong> ${data.result_date}</p>
+  `;
+});
+
+loadCategories();
+</script>
+
+</body>
+</html>
+
