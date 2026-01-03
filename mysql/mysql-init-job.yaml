@@ -2,7 +2,7 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: mysql-init-job
-  namespace: default
+  namespace: db
   annotations:
     # ArgoCD가 모든 리소스를 배포한 후에 이 Job을 실행하도록 설정
     argocd.argoproj.io/hook: PostSync
