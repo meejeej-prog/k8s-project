@@ -12,17 +12,6 @@ spec:
   podSpec:
     containers:
     - name: mysql
-      # 컨테이너 실행 직후 init.sql 실행
-      lifecycle:
-        postStart:
-          exec:
-            command:
-            - "/bin/bash"
-            - "-c"
-            - |
-              until mysql -u root -p${MYSQL_ROOT_PASSWORD} -e "SELECT 1" >/dev/null 2>&1; do # 1을 출력시켜 DB 실행 확인, >/dev/null 2>&1 : DB 실행 전 생기는 오류 로그 화면 출력 금지
-                sleep 5
-              mysql -u root -p${MYSQL_ROOT_PASSWORD} < /docker-entrypoint-initdb.d/init.sql
       # Startup Probe : MySQL이 켜질 때 까지 기다림
       startupProbe:
         exec:

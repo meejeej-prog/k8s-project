@@ -1,0 +1,36 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: mysql-init-sql
+spec:
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+      - name: init-db
+        image: mysql:8.0
+        command:
+        - "/bin/bash"
+        - "-c"
+        - |
+          # 1을 입력하며 DB 접속 확인
+          until mysql -h mysql-cluster -u root -p"${MYSQL_ROOT_PASSWORD}" -e 'SELECT 1'; do
+            sleep 5
+          done
+
+          # ConfigMap에서 가져온 SQL 실행
+          mysql -h mysql-cluster -u root -p"${MYSQL_ROOT_PASSWORD}" < /sql/init.sql
+
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: secret
+              key: rootPassword
+        volumeMounts:
+        - name: sql-vol
+          mountPath: /sql
+      volumes:
+      - name: sql-vol
+        configMap:
+          name: mysql-configmap
