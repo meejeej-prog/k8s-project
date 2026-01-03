@@ -4,37 +4,60 @@ metadata:
   name: mysql-cluster
 spec:
   secretName: secret
-  instances: 3
+  instances: 3 # 3-node HA
   router:
-    instances: 1
-  tlsUseSelfSigned: true
+    instances: 1 # Router 1개
 
-  # Pod 설정 최적화
+  # configMap 설정
   podSpec:
     containers:
     - name: mysql
-      # 오퍼레이터가 관리하는 기본 프로브를 덮어쓰게 됩니다.
+      # 컨테이너 실행 직후 init.sql 실행
+      lifecycle:
+        postStart:
+          exec:
+            command:
+            - "/bin/bash"
+            - "-c"
+            - |
+              until mysql -u root -p${MYSQL_ROOT_PASSWORD} -e "SELECT 1" >/dev/null 2>&1; do # 1을 출력시켜 DB 실행 확인, >/dev/null 2>&1 : DB 실행 전 생기는 오류 로그 화면 출력 금지
+                sleep 5
+              mysql -u root -p${MYSQL_ROOT_PASSWORD} < /docker-entrypoint-initdb.d/init.sql
+      # Startup Probe : MySQL이 켜질 때 까지 기다림
+      startupProbe:
+        exec:
+          command: ["/livenessprobe.sh", "8"]
+        initialDelaySeconds: 10
+        periodSeconds: 5
+        timeoutSeconds: 15
+        failureThreshold: 30
+      # Readiness Probe : 서비스 투입 준비 확인
       readinessProbe:
-        initialDelaySeconds: 30
+        exec:
+          command: ["/readinessprobe.sh"]
+        initialDelaySeconds: 15
         periodSeconds: 10
         timeoutSeconds: 10
+      # Liveness Probe : 가동 중 생존 확인
       livenessProbe:
-        initialDelaySeconds: 60
+        exec:
+          command: ["/livenessprobe.sh"]
+        initialDelaySeconds: 15
         periodSeconds: 20
         timeoutSeconds: 10
+
       volumeMounts:
-      - name: init-sql
+      - name: init-sql-vol
         mountPath: /docker-entrypoint-initdb.d
     volumes:
-    - name: init-sql
+    - name: init-sql-vol
       configMap:
         name: mysql-configmap
 
-  # PVC 템플릿 (spec 추가됨)
+  tlsUseSelfSigned: true
   datadirVolumeClaimTemplate:
-    spec:
-      storageClassName: manual
-      accessModes: [ "ReadWriteOnce" ]
-      resources:
-        requests:
-          storage: 5G
+    storageClassName: manual
+    accessModes: [ "ReadWriteOnce" ]
+    resources:
+      requests:
+        storage: 5G # 각 노드 당 5G 디스
