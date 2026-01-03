@@ -2,6 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: mysql-configmap
+  namespace: db
 data:
   init.sql: |
     CREATE USER IF NOT EXISTS 'jiwon'@'%' IDENTIFIED BY '1234';
@@ -14,7 +15,7 @@ data:
 
     USE exam;
 
-    CREATE TABLE exam_info (
+    CREATE TABLE IF NOT EXISTS exam_info (
         id INT AUTO_INCREMENT PRIMARY KEY,
         category VARCHAR(50) NOT NULL,          -- 자격증 종류 구분
         cert_name VARCHAR(100) NOT NULL,        -- 자격증 이름
@@ -28,7 +29,7 @@ data:
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     );
 
-    INSERT INTO exam_info (category, cert_name, regist_start_date, regist_end_date, exam_start_date, exam_end_date, result_start_date, result_end_date)
+    INSERT INGNORE INTO exam_info (category, cert_name, regist_start_date, regist_end_date, exam_start_date, exam_end_date, result_start_date, result_end_date)
     VALUES
     ('Network', 'CCNA', '2025-12-31', '2026-01-07', '2026-01-10', '2026-01-15', '2026-01-20', '2026-01-25'),
     ('Network', 'Network+', '2026-01-22', '2026-01-29', '2026-02-01', '2026-02-05', '2026-02-10', '2026-02-15'),
@@ -56,7 +57,7 @@ data:
     create database candidate;
     use candidate;
 
-    CREATE TABLE candidate_info (
+    CREATE TABLE IF NOT EXISTS candidate_info (
         candidate_id INT AUTO_INCREMENT PRIMARY KEY,
         name VARCHAR(50) NOT NULL,            -- 이름 구분
         birth DATE  NOT NULL,                 -- 생년월일

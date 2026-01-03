@@ -19,7 +19,7 @@ metadata:
 subjects:
 - kind: ServiceAccount
   name: mysql-cluster-sidecar-sa
-  namespace: default
+  namespace: db
 roleRef:
   kind: ClusterRole
   name: mysql-sidecar-viewer-role

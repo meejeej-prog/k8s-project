@@ -4,6 +4,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: apply-fastapi-deployment
+  namespace: apply
   labels:
     app: apply-fastapi
 spec:
@@ -28,7 +29,7 @@ spec:
             cpu: "500m"
         env:
         - name: MYSQL_HOST
-          value: "mysql-cluster"
+          value: "mysql-cluster.db"
         - name: MYSQL_USER
           valueFrom:
             secretKeyRef:
@@ -59,6 +60,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: schedule-fastapi-deployment
+  namespace: schedule
   labels:
     app: schedule-fastapi
 spec:
@@ -78,7 +80,7 @@ spec:
         - containerPort: 8000
         env:
         - name: MYSQL_HOST
-          value: "mysql-cluster"
+          value: "mysql-cluster.db"
         - name: MYSQL_USER
           valueFrom:
             secretKeyRef:
@@ -108,6 +110,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: result-fastapi-deployment
+  namespace: result
   labels:
     app: result-fastapi
 spec:
@@ -132,7 +135,7 @@ spec:
             cpu: "500m"
         env:
         - name: MYSQL_HOST
-          value: "mysql-cluster"
+          value: "mysql-cluster.db"
         - name: MYSQL_USER
           valueFrom:
             secretKeyRef:
@@ -165,6 +168,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: apply-fastapi-service
+  namespace: apply
 spec:
   selector:
     app: apply-fastapi
@@ -180,6 +184,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: schedule-fastapi-service
+  namespace: schedule
 spec:
   selector:
     app: schedule-fastapi
@@ -195,6 +200,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: result-fastapi-service
+  namespace: result
 spec:
   selector:
     app: result-fastapi
@@ -211,6 +217,7 @@ apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
   name: apply-fastapi-hpa
+  namespace: apply
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
@@ -231,6 +238,7 @@ apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
   name: result-fastapi-hpa
+  namespace: result
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
