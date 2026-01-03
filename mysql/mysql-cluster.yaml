@@ -4,34 +4,21 @@ metadata:
   name: mysql-cluster
 spec:
   secretName: secret
-  instances: 3
+  instances: 3 # 3-node HA
   router:
-    instances: 1
+    instances: 1 # Router 1개
   tlsUseSelfSigned: true
   podSpec:
     containers:
     - name: mysql
-      lifecycle:
-        postStart:
-          exec:
-            command: 
-            - "/bin/bash"
-            - "-c"
-            - |
-              # DB가 준비될 때까지 기다렸다가 백그라운드에서 init.sql 실행 (파드 시작 차단 방지)
-              nohup bash -c "
-              until mysql -u root -p\${MYSQL_ROOT_PASSWORD} -e 'SELECT 1' >/dev/null 2>&1; do
-                sleep 5
-              done
-              mysql -u root -p\${MYSQL_ROOT_PASSWORD} < /docker-entrypoint-initdb.d/init.sql
-              " > /var/log/mysql-init.log 2>&1 &
+      # [수정] postStart 훅 제거: NFS 지연 시 파드 사망 방지 및 초기화 Job으로 기능 분리
       startupProbe:
         exec:
           command: ["/livenessprobe.sh", "8"]
         initialDelaySeconds: 15
         periodSeconds: 5
         timeoutSeconds: 15
-        failureThreshold: 100
+        failureThreshold: 100 # 넉넉하게 설정 (최대 500초)
       readinessProbe:
         exec:
           command: ["/readinessprobe.sh"]
@@ -56,4 +43,4 @@ spec:
     accessModes: [ "ReadWriteOnce" ]
     resources:
       requests:
-        storage: 5G
+        storage: 5G # 각 노드 당 5G 디스크
