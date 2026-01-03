@@ -8,33 +8,52 @@ spec:
   router:
     instances: 1
   tlsUseSelfSigned: true
-
-  # Pod 설정 최적화
   podSpec:
     containers:
     - name: mysql
-      # 오퍼레이터가 관리하는 기본 프로브를 덮어쓰게 됩니다.
+      lifecycle:
+        postStart:
+          exec:
+            command: 
+            - "/bin/bash"
+            - "-c"
+            - |
+              # DB가 준비될 때까지 기다렸다가 백그라운드에서 init.sql 실행 (파드 시작 차단 방지)
+              nohup bash -c "
+              until mysql -u root -p\${MYSQL_ROOT_PASSWORD} -e 'SELECT 1' >/dev/null 2>&1; do
+                sleep 5
+              done
+              mysql -u root -p\${MYSQL_ROOT_PASSWORD} < /docker-entrypoint-initdb.d/init.sql
+              " > /var/log/mysql-init.log 2>&1 &
+      startupProbe:
+        exec:
+          command: ["/livenessprobe.sh", "8"]
+        initialDelaySeconds: 15
+        periodSeconds: 5
+        timeoutSeconds: 15
+        failureThreshold: 100
       readinessProbe:
-        initialDelaySeconds: 30
+        exec:
+          command: ["/readinessprobe.sh"]
+        initialDelaySeconds: 15
         periodSeconds: 10
         timeoutSeconds: 10
       livenessProbe:
-        initialDelaySeconds: 60
+        exec:
+          command: ["/livenessprobe.sh"]
+        initialDelaySeconds: 15
         periodSeconds: 20
         timeoutSeconds: 10
       volumeMounts:
-      - name: init-sql
+      - name: init-sql-vol
         mountPath: /docker-entrypoint-initdb.d
     volumes:
-    - name: init-sql
+    - name: init-sql-vol
       configMap:
         name: mysql-configmap
-
-  # PVC 템플릿 (spec 추가됨)
   datadirVolumeClaimTemplate:
-    spec:
-      storageClassName: manual
-      accessModes: [ "ReadWriteOnce" ]
-      resources:
-        requests:
-          storage: 5G
+    storageClassName: manual
+    accessModes: [ "ReadWriteOnce" ]
+    resources:
+      requests:
+        storage: 5G

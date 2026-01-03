@@ -1,0 +1,26 @@
+# 오늘의 에러 분석 및 해결 보고서
+
+## 1. Probe Timeout (CrashLoopBackOff)
+- **증상**: 파드가 켜지자마자 `Killing` 이벤트와 함께 계속 재시작됨.
+- **원인**: 기본 타임아웃(1s)이 너무 짧아 NFS 스토리지의 응답을 기다리지 못함.
+- **해결**: `startupProbe`, `readinessProbe`, `livenessProbe`의 `timeoutSeconds`를 **10~15s**로 늘리고, 대기 횟수를 상향 조정함.
+
+## 2. Data Directory Not Empty (InitialDB Error)
+- **증상**: `initmysql` 컨테이너가 에러를 내며 DB 초기화 실패.
+- **원인**: NFS 폴더 안에 이전 설치의 찌꺼기나 시스템 파일(`.lost+found`)이 남아있어 "비어있지 않은 폴더"로 인식함.
+- **해결**: NFS 서버에서 `rm -rf`를 통해 폴더 내용물을 완전히 비운 후 재생성함.
+
+## 3. SQL Plugin Error (1524)
+- **증상**: `init.sql` 실행 중 `mysql_native_password` 플러그인이 없다는 에러 발생.
+- **원인**: MySQL 8.0 이상에서 기본 인증 방식이 변경되어 구식 구문을 거부함.
+- **해결**: `IDENTIFIED WITH mysql_native_password` 문구를 삭제하거나 `IDENTIFIED BY`로 수정함.
+
+## 4. ArgoCD Case Sensitivity (404 Not Found)
+- **증상**: ArgoCD 앱 생성 시 경로를 찾을 수 없다고 나옴.
+- **원인**: Git의 폴더명은 `fastAPI`인데 설정에 `fastapi`라고 소문자로 입력함.
+- **해결**: 대소문자를 정확히 일치시켜 해결함.
+
+## 5. Finalizer Blocking (Delete Hang)
+- **증상**: `kubectl delete`를 해도 리소스가 `Terminating`에서 멈춰있음.
+- **원인**: `finalizers`라는 보호 장치가 걸려 있어 삭제 전 정리를 기다리는 중.
+- **해결**: `kubectl patch` 명령어를 사용하여 `finalizers`를 강제로 `[]`(빈 값)으로 만들어 즉시 삭제함.

@@ -1,0 +1,41 @@
+# 2026년 1월 2일 최종 작업 로그 (GitOps & MySQL 최적화)
+
+## 1. 개요
+쿠버네티스 환경에 MySQL InnoDBCluster를 구축하고, ArgoCD를 도입하여 GitOps 기반의 지속적 배포(CD) 환경을 완성함.
+
+## 2. 주요 구성 요소 및 개념 설명
+
+### A. ArgoCD (GitOps 도구)
+- **개념**: Git 저장소를 '진실의 원천(Source of Truth)'으로 삼아, Git의 코드와 클러스터의 상태를 자동으로 일치시키는 도구입니다.
+- **핵심 기능**:
+    - **Sync (동기화)**: Git의 최신 YAML 내용을 서버에 적용함.
+    - **Self-Heal (자가 치유)**: 누군가 서버에서 수동으로 설정을 바꾸면, ArgoCD가 이를 감지해 다시 Git 상태로 원복시킴.
+    - **Prune (가지치기)**: Git에서 파일을 지우면 서버에서도 해당 리소스를 삭제함.
+- **도입 효과**: 사람이 직접 `kubectl apply`를 칠 필요 없이, Git Push만으로 안전하게 배포가 가능해짐.
+
+### B. Kubernetes Probes (상태 확인)
+- **Startup Probe**: 컨테이너가 처음 켜질 때까지 기다려주는 관문. (NFS 환경에서는 오래 걸리므로 넉넉히 설정 필수)
+- **Readiness Probe**: 서비스(네트워크)를 연결해도 되는지 확인. 실패 시 트래픽 차단.
+- **Liveness Probe**: 컨테이너가 살아있는지 확인. 실패 시 파드를 재시작함.
+
+### C. Lifecycle Hooks (`postStart`)
+- 컨테이너가 시작된 직후에 특정 스크립트를 실행하는 기능입니다. 
+- 이번 프로젝트에서는 MySQL이 켜지는 것을 감시하다가(`until` 루프), 준비가 되면 자동으로 `init.sql`을 실행하도록 설정했습니다.
+
+## 3. 상세 설치 및 설정 단계
+
+### Step 1: ArgoCD 설치 및 외부 노출
+- `LoadBalancer` 타입을 사용하여 전용 IP를 할당받고 웹 UI를 노출함.
+- GitHub Private 저장소 연동을 위해 Personal Access Token(PAT)을 사용함.
+
+### Step 2: MySQL Cluster 최적화 (NFS 대응)
+- **문제**: NFS의 지연(Latency) 때문에 1초 타임아웃에 걸려 파드가 무한 재시작됨.
+- **해결**: `mysql-cluster.yaml`의 모든 Probe 타임아웃을 10~15초로 연장하고, `failureThreshold`를 높여 최대 8분까지 기다리도록 수정함.
+
+### Step 3: 데이터 초기화 자동화 완성
+- **파일**: `workspace/k8s-project/mysql/mysql-cluster.yaml`
+- **내용**: `postStart` 핸들러에 `until` 루프를 추가하여 DB 가동 즉시 `/docker-entrypoint-initdb.d/init.sql`이 실행되도록 구성.
+
+## 4. 전후 비교 (Before & After)
+- **전**: 수동 `kubectl apply` 사용, NFS 지연으로 인한 파드 재시작 무한 루프, `init.sql` 자동 실행 안 됨.
+- **후**: Git Push로 자동 배포, 넉넉한 타임아웃으로 안정적 가동, DB 부팅 즉시 데이터 자동 주입 완료.
