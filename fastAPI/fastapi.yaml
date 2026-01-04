@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
       - name: apply-fastapi
-        image: jiwon888/fastapi:3.9
+        image: jiwon888/fastapi:4.1
         ports:
         - containerPort: 8000
         resources:
@@ -75,7 +75,7 @@ spec:
     spec:
       containers:
       - name: schedule-fastapi
-        image: jiwon888/fastapi:3.9
+        image: jiwon888/fastapi:4.1
         ports:
         - containerPort: 8000
         env:
@@ -125,7 +125,7 @@ spec:
     spec:
       containers:
       - name: result-fastapi
-        image: jiwon888/fastapi:3.9
+        image: jiwon888/fastapi:4.1
         ports:
         - containerPort: 8000
         resources:

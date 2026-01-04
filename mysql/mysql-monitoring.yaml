@@ -86,6 +86,7 @@ spec:
   endpoints:
   - port: metrics
     interval: 30s
+    honorLabels: true
     relabelings:
     - targetLabel: job
       replacement: mysql

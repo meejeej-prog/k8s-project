@@ -14,29 +14,26 @@ MYSQL_PASSWORD = os.environ.get("MYSQL_PASSWORD")
 MYSQL_DB_1 = os.environ.get("MYSQL_DB_1")
 MYSQL_DB_2 = os.environ.get("MYSQL_DB_2")
 
-# 쓰기 전용 DB Port 변수 선언
-MYSQL_PORT_RW = int(os.environ.get("MYSQL_PORT_RW", 6446))
-# 읽기 전용 DB Port 변수 선언
-MYSQL_PORT_RO = int(os.environ.get("MYSQL_PORT_RO", 6447))
+try:
+    # 쓰기 전용 DB Port 변수 선언
+    MYSQL_PORT_RW = int(os.environ.get("MYSQL_PORT_RW", 6446))
+    # 읽기 전용 DB Port 변수 선언
+    MYSQL_PORT_RO = int(os.environ.get("MYSQL_PORT_RO", 6447))
+except (ValueError, TypeError):
+    MYSQL_PORT_RW = 6446
+    MYSQL_PORT_RO = 6447
 
-# DB 선언
-exam_conn = pymysql.connect(
-    host=MYSQL_HOST,
-    port=MYSQL_PORT_RO,
-    user=MYSQL_USER,
-    password=MYSQL_PASSWORD,
-    database=MYSQL_DB_1,
-    cursorclass=pymysql.cursors.DictCursor
-)
-
-candidate_conn = pymysql.connect(
-    host=MYSQL_HOST,
-    port=MYSQL_PORT_RW,
-    user=MYSQL_USER,
-    password=MYSQL_PASSWORD,
-    database=MYSQL_DB_2,
-    cursorclass=pymysql.cursors.DictCursor
-)
+# DB 연결 함수 정의
+def get_db_conn(db_name, port):
+    return pymysql.connect(
+        host=MYSQL_HOST,
+        port=port,
+        user=MYSQL_USER,
+        password=MYSQL_PASSWORD,
+        database=db_name,
+        cursorclass=pymysql.cursors.DictCursor,
+        autocommit=True
+    )
 
 # 1️⃣ 카테고리 목록
 @app.get("/apply",response_class=HTMLResponse)
@@ -45,21 +42,30 @@ def serve_apply(request: Request):
             "apply.html",
             {"request":request}
             )
+
 @app.get("/apply/categories")
 def get_categories():
-    with exam_conn.cursor() as cursor:
-        cursor.execute("SELECT DISTINCT category FROM exam_info")
-        return [row["category"] for row in cursor.fetchall()]
+    conn = get_db_conn(MYSQL_DB_1, MYSQL_PORT_RO)
+    try:
+        with conn.cursor() as cursor:
+            cursor.execute("SELECT DISTINCT category FROM exam_info")
+            return [row["category"] for row in cursor.fetchall()]
+    finally:
+        conn.close()
 
 # 2️⃣ 카테고리별 자격증 목록
 @app.get("/apply/exams")
 def get_exams(category: str):
-    with exam_conn.cursor() as cursor:
-        cursor.execute(
-            "SELECT cert_name FROM exam_info WHERE category=%s",
-            (category,)
-        )
-        return [row["cert_name"] for row in cursor.fetchall()]
+    conn = get_db_conn(MYSQL_DB_1, MYSQL_PORT_RO)
+    try:
+        with conn.cursor() as cursor:
+            cursor.execute(
+                "SELECT cert_name FROM exam_info WHERE category=%s",
+                (category,)
+            )
+            return [row["cert_name"] for row in cursor.fetchall()]
+    finally:
+        conn.close()
 
 # 3️⃣ 신청 처리
 @app.post("/apply")
@@ -69,16 +75,20 @@ def apply_exam(
     name: str = Form(...),
     birthdate: str = Form(...)
 ):
-    with candidate_conn.cursor() as cursor:
-        cursor.execute(
-            """
-            INSERT INTO candidate_info
-            (name, birth, exam_category, exam_name)
-            VALUES (%s, %s, %s, %s)
-            """,
-            (name, birthdate, category, exam_name)
-        )
-        candidate_conn.commit()
+    conn = get_db_conn(MYSQL_DB_2, MYSQL_PORT_RW)
+    try:
+        with conn.cursor() as cursor:
+            cursor.execute(
+                """
+                INSERT INTO candidate_info
+                (name, birth, exam_category, exam_name)
+                VALUES (%s, %s, %s, %s)
+                """,
+                (name, birthdate, category, exam_name)
+            )
+            conn.commit()
+    finally:
+        conn.close()
 
     return JSONResponse({
     "status": "success",
@@ -100,18 +110,22 @@ def serve_schedule(request: Request):
 @app.get("/schedule/data")
 def get_exam_schedule(category: str, exam_name: str):
     try:
-        with exam_conn.cursor() as cursor:
-            cursor.execute(
-                """
-                SELECT category, cert_name,regist_start_date, regist_end_date,
-                       exam_start_date, exam_end_date,
-                       result_start_date, result_end_date
-                FROM exam_info
-                WHERE category=%s AND cert_name=%s
-                """,
-                (category, exam_name)
-            )
-            row = cursor.fetchone()
+        conn = get_db_conn(MYSQL_DB_1, MYSQL_PORT_RO)
+        try:
+            with conn.cursor() as cursor:
+                cursor.execute(
+                    """
+                    SELECT category, cert_name,regist_start_date, regist_end_date,
+                           exam_start_date, exam_end_date,
+                           result_start_date, result_end_date
+                    FROM exam_info
+                    WHERE category=%s AND cert_name=%s
+                    """,
+                    (category, exam_name)
+                )
+                row = cursor.fetchone()
+        finally:
+            conn.close()
 
         if not row:
             return JSONResponse(status_code=404, content={"error": "시험 일정 없음"})
@@ -141,16 +155,20 @@ def serve_result(request: Request):
 @app.get("/result/data")
 def get_result(category: str, exam_name: str, name: str, birth: str):
     try:
-        with candidate_conn.cursor() as cursor:
-            cursor.execute(
-                """
-                SELECT name, exam_category, exam_name, result
-                FROM candidate_info
-                WHERE name=%s AND birth=%s AND exam_category=%s AND exam_name=%s
-                """,
-                (name, birth, category, exam_name)
-            )
-            row = cursor.fetchone()
+        conn = get_db_conn(MYSQL_DB_2, MYSQL_PORT_RW)
+        try:
+            with conn.cursor() as cursor:
+                cursor.execute(
+                    """
+                    SELECT name, exam_category, exam_name, result
+                    FROM candidate_info
+                    WHERE name=%s AND birth=%s AND exam_category=%s AND exam_name=%s
+                    """,
+                    (name, birth, category, exam_name)
+                )
+                row = cursor.fetchone()
+        finally:
+            conn.close()
 
         if not row:
             return JSONResponse(
