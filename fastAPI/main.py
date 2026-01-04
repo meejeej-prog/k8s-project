@@ -14,11 +14,12 @@ MYSQL_PASSWORD = os.environ.get("MYSQL_PASSWORD")
 MYSQL_DB_1 = os.environ.get("MYSQL_DB_1")
 MYSQL_DB_2 = os.environ.get("MYSQL_DB_2")
 
+MYSQL_PORT_RW_ENV = os.environ.get("MYSQL_PORT_RW", "6446")
+MYSQL_PORT_RO_ENV = os.environ.get("MYSQL_PORT_RO", "6447")
+
 try:
-    # 쓰기 전용 DB Port 변수 선언
-    MYSQL_PORT_RW = int(os.environ.get("MYSQL_PORT_RW", 6446))
-    # 읽기 전용 DB Port 변수 선언
-    MYSQL_PORT_RO = int(os.environ.get("MYSQL_PORT_RO", 6447))
+    MYSQL_PORT_RW = int(MYSQL_PORT_RW_ENV)
+    MYSQL_PORT_RO = int(MYSQL_PORT_RO_ENV)
 except (ValueError, TypeError):
     MYSQL_PORT_RW = 6446
     MYSQL_PORT_RO = 6447
