@@ -37,7 +37,7 @@ spec:
         image: prom/mysqld-exporter:v0.15.0
         args:
         - "--config.my-cnf=/etc/mysql-exporter/my-cnf"
-        - "--collect.slave_status=false"
+        - "--no-collect.slave_status"
         ports:
         - containerPort: 9104
           name: metrics
@@ -86,3 +86,6 @@ spec:
   endpoints:
   - port: metrics
     interval: 30s
+    relabelings:
+    - targetLabel: job
+      replacement: mysql
