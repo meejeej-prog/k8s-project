@@ -37,6 +37,7 @@ spec:
         image: prom/mysqld-exporter:v0.15.0
         args:
         - "--config.my-cnf=/etc/mysql-exporter/my-cnf"
+        - "--collect.slave_status=false"
         ports:
         - containerPort: 9104
           name: metrics
