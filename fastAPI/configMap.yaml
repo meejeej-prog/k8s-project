@@ -8,7 +8,7 @@ data:
         listen 80;
 
         location /schedule {
-            proxy_pass http://fastapi-service:80/schedule;
+            proxy_pass http://schedule-fastapi-service.schedule:80/schedule;
             proxy_set_header Host $host;
             proxy_set_header X-Real-IP $remote_addr;
         }

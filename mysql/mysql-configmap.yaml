@@ -11,25 +11,25 @@ data:
     GRANT REPLICATION SLAVE ON *.* TO 'repl_user'@'%';
     FLUSH PRIVILEGES;
 
-    CREATE DATABASE exam;
+    CREATE DATABASE IF NOT EXISTS exam;
 
     USE exam;
 
     CREATE TABLE IF NOT EXISTS exam_info (
         id INT AUTO_INCREMENT PRIMARY KEY,
-        category VARCHAR(50) NOT NULL,          -- 자격증 종류 구분
-        cert_name VARCHAR(100) NOT NULL,        -- 자격증 이름
-        regist_start_date DATE NOT NULL,        -- 접수 시작일
-        regist_end_date DATE NOT NULL,          -- 접수 종료일
-        exam_start_date DATE NOT NULL,          -- 시험 시작일
-        exam_end_date DATE NOT NULL,            -- 시험 종료일
-        result_start_date DATE NOT NULL,        -- 결과 확인 시작일
-        result_end_date DATE NOT NULL,          -- 결과 확인 종료일
+        category VARCHAR(50) NOT NULL,
+        cert_name VARCHAR(100) NOT NULL,
+        regist_start_date DATE NOT NULL,
+        regist_end_date DATE NOT NULL,
+        exam_start_date DATE NOT NULL,
+        exam_end_date DATE NOT NULL,
+        result_start_date DATE NOT NULL,
+        result_end_date DATE NOT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     );
 
-    INSERT INGNORE INTO exam_info (category, cert_name, regist_start_date, regist_end_date, exam_start_date, exam_end_date, result_start_date, result_end_date)
+    INSERT IGNORE INTO exam_info (category, cert_name, regist_start_date, regist_end_date, exam_start_date, exam_end_date, result_start_date, result_end_date)
     VALUES
     ('Network', 'CCNA', '2025-12-31', '2026-01-07', '2026-01-10', '2026-01-15', '2026-01-20', '2026-01-25'),
     ('Network', 'Network+', '2026-01-22', '2026-01-29', '2026-02-01', '2026-02-05', '2026-02-10', '2026-02-15'),
@@ -54,15 +54,15 @@ data:
     ('CI/CD', 'AWS-DevOps', '2026-03-05', '2026-03-12', '2026-03-15', '2026-03-20', '2026-03-25', '2026-03-30');
 
 
-    create database candidate;
-    use candidate;
+    CREATE DATABASE IF NOT EXISTS candidate;
+    USE candidate;
 
     CREATE TABLE IF NOT EXISTS candidate_info (
         candidate_id INT AUTO_INCREMENT PRIMARY KEY,
-        name VARCHAR(50) NOT NULL,            -- 이름 구분
-        birth DATE  NOT NULL,                 -- 생년월일
-        exam_category VARCHAR(50) NOT NULL,   -- 자격증 카테고리
-        exam_name   VARCHAR(100)    NOT NULL, -- 자격증 이름
-        result      VARCHAR(10)               -- 시험 결과
+        name VARCHAR(50) NOT NULL,
+        birth DATE  NOT NULL,
+        exam_category VARCHAR(50) NOT NULL,
+        exam_name   VARCHAR(100)    NOT NULL,
+        result      VARCHAR(10)
     );
                                                           

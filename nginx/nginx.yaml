@@ -3,6 +3,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: main-nginx
+  namespace: main
 spec:
   replicas: 1
   selector:
@@ -58,7 +59,7 @@ spec:
         app: result-nginx
     spec: 
       containers:
-      - name: apply-nginx
+      - name: result-nginx
         image: nginx:1.29.3-alpine
         imagePullPolicy: Always 
         ports:
@@ -80,7 +81,7 @@ spec:
         app: schedule-nginx
     spec: 
       containers:
-      - name: apply-nginx
+      - name: schedule-nginx
         image: nginx:1.29.3-alpine
         imagePullPolicy: Always 
         ports:
@@ -91,6 +92,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: main-nginx-svc
+  namespace: main
 spec:
   type: ClusterIP
   selector:
@@ -180,7 +182,7 @@ spec:
         path: /apply
         backend:
           service:
-            name: main-nginx-svc
+            name: apply-nginx-svc
             port:
               number: 80
 
@@ -201,7 +203,7 @@ spec:
         path: /result
         backend:
           service:
-            name: main-nginx-svc
+            name: result-nginx-svc
             port:
               number: 80
 
@@ -221,6 +223,6 @@ spec:
         path: /schedule
         backend:
           service:
-            name: main-nginx-svc
+            name: schedule-nginx-svc
             port:
               number: 80

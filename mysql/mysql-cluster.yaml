@@ -32,13 +32,6 @@ spec:
         initialDelaySeconds: 15
         periodSeconds: 20
         timeoutSeconds: 10
-      volumeMounts:
-      - name: init-sql-vol
-        mountPath: /docker-entrypoint-initdb.d
-    volumes:
-    - name: init-sql-vol
-      configMap:
-        name: mysql-configmap
   datadirVolumeClaimTemplate:
     storageClassName: manual
     accessModes: [ "ReadWriteOnce" ]

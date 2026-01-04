@@ -74,7 +74,7 @@ spec:
         app: schedule-fastapi
     spec:
       containers:
-      - name: schdule-fastapi
+      - name: schedule-fastapi
         image: jiwon888/fastapi:3.9
         ports:
         - containerPort: 8000
