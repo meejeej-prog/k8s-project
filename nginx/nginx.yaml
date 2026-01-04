@@ -157,7 +157,7 @@ spec:
               number: 80
 
       - pathType: Prefix
-        path: /
+        path: /result
         backend:
           service:
             name: result-external-svc
@@ -165,7 +165,7 @@ spec:
               number: 80
 
       - pathType: Prefix
-        path: /
+        path: /schedule
         backend:
           service:
             name: schedule-external-svc
