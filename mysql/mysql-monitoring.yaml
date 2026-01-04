@@ -1,0 +1,78 @@
+# Exporter 접속 정보 Secret
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mysql-export-secret
+  namespace: db
+type: Opaque
+stringData:
+  datasource: "monitoring:1234@(mysql-cluster.db:3306)/"
+
+---
+# Deploy
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql-exporter
+  namespace: db
+  labels:
+    app: mysql-exporter
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql-exporter
+  template:
+    metadata:
+      labels:
+        app: mysql-exporter
+    spec:
+      containers:
+      - name: mysql-exporter
+        image: prom/mysqld-exporter:v0.15.0
+        env:
+        - name: DATA_SOURCE_NAME
+          valueFrom:
+            secretKeyRef:
+              name: mysql-export-secret
+              key: datasource
+        ports:
+        - containerPort: 9104
+          name: metrics
+
+---
+# Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql-exporter-svc
+  namespace: db
+  labels:
+    app: mysql-exporter
+spec:
+  ports:
+  - name: metrics
+    port: 9104
+    targetPort: 9104
+  selector:
+    app: mysql-exporter
+
+---
+# ServiceMonitor : Prometheus가 자동으로 데이터를 가져가게 함
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: mysql-exporter-monitor
+  namespace: db
+  labels:
+    release: prometheus-stack # 설치한 kube-prometheus-stack의 release와 같아야 함
+spec:
+  selector:
+    matchLabels:
+      app: mysql-exporter
+  namespaceSelector:
+    matchNames:
+    - db
+  endpoints:
+  - port: metrics
+    interval: 30s
