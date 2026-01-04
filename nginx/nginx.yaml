@@ -105,47 +105,29 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: apply-nginx-svc
-  namespace: apply
+  name: apply-external-svc
+  namespace: main
 spec:
-  type: ClusterIP
-  selector:
-    app: apply-nginx
-  ports:
-  - protocol: TCP
-    port: 80
-    targetPort: 80
-
+  type: ExternalName
+  externalName: apply-fastapi-service.apply.svc.cluster.local
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: result-nginx-svc
-  namespace: result
+  name: result-external-svc
+  namespace: main
 spec:
-  type: ClusterIP
-  selector:
-    app: result-nginx
-  ports:
-  - protocol: TCP
-    port: 80
-    targetPort: 80
-
+  type: ExternalName
+  externalName: result-fastapi-service.result.svc.cluster.local
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: schedule-nginx-svc
-  namespace: schedule
+  name: schedule-external-svc
+  namespace: main
 spec:
-  type: ClusterIP
-  selector:
-    app: schedule-nginx
-  ports:
-  - protocol: TCP
-    port: 80
-    targetPort: 80
-
+  type: ExternalName
+  externalName: schedule-fastapi-service.schedule.svc.cluster.local
 ---
 # Ingress
 apiVersion: networking.k8s.io/v1
@@ -166,63 +148,26 @@ spec:
             port:
               number: 80
 
----
-
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: nginx-ingress-apply
-  namespace: apply
-spec:
-  ingressClassName: nginx
-  rules:
-  - http:
-      paths:
       - pathType: Prefix
         path: /apply
         backend:
           service:
-            name: apply-fastapi-service
+            name: apply-external-svc
             port:
               number: 80
 
-
----
-
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: nginx-ingress-result
-  namespace: result
-spec:
-  ingressClassName: nginx
-  rules:
-  - http:
-      paths:
       - pathType: Prefix
-        path: /result
+        path: /
         backend:
           service:
-            name: result-fastapi-service
+            name: result-external-svc
             port:
               number: 80
 
----
-
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: nginx-ingress-schedule
-  namespace: schedule
-spec:
-  ingressClassName: nginx
-  rules:
-  - http:
-      paths:
       - pathType: Prefix
-        path: /schedule
+        path: /
         backend:
           service:
-            name: schedule-fastapi-service
+            name: schedule-external-svc
             port:
               number: 80
