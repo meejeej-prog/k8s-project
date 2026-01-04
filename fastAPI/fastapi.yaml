@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
       - name: apply-fastapi
-        image: jiwon888/fastapi:4.2
+        image: jiwon888/fastapi:4.3
         ports:
         - containerPort: 8000
         resources:
@@ -51,9 +51,9 @@ spec:
               name: secret
               key: mysql-database-2
         - name: MYSQL_PORT_RW
-          value: "6446"
+          value: "3306"
         - name: MYSQL_PORT_RO
-          value: "6447"
+          value: "3306"
 ---
 
 apiVersion: apps/v1
@@ -75,7 +75,7 @@ spec:
     spec:
       containers:
       - name: schedule-fastapi
-        image: jiwon888/fastapi:4.2
+        image: jiwon888/fastapi:4.3
         ports:
         - containerPort: 8000
         env:
@@ -102,9 +102,9 @@ spec:
               name: secret
               key: mysql-database-2
         - name: MYSQL_PORT_RW
-          value: "6446"
+          value: "3306"
         - name: MYSQL_PORT_RO
-          value: "6447"
+          value: "3306"
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -125,7 +125,7 @@ spec:
     spec:
       containers:
       - name: result-fastapi
-        image: jiwon888/fastapi:4.2
+        image: jiwon888/fastapi:4.3
         ports:
         - containerPort: 8000
         resources:
@@ -157,9 +157,9 @@ spec:
               name: secret
               key: mysql-database-2
         - name: MYSQL_PORT_RW
-          value: "6446"
+          value: "3306"
         - name: MYSQL_PORT_RO
-          value: "6447"
+          value: "3306"
 ---
 
 # Service
