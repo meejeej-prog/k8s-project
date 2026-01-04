@@ -29,7 +29,7 @@ spec:
             cpu: "500m"
         env:
         - name: MYSQL_HOST
-          value: "mysql-cluster.db"
+          value: "mysql-cluster-router.db"
         - name: MYSQL_USER
           valueFrom:
             secretKeyRef:
@@ -80,7 +80,7 @@ spec:
         - containerPort: 8000
         env:
         - name: MYSQL_HOST
-          value: "mysql-cluster.db"
+          value: "mysql-cluster-router.db"
         - name: MYSQL_USER
           valueFrom:
             secretKeyRef:
@@ -135,7 +135,7 @@ spec:
             cpu: "500m"
         env:
         - name: MYSQL_HOST
-          value: "mysql-cluster.db"
+          value: "mysql-cluster-router.db"
         - name: MYSQL_USER
           valueFrom:
             secretKeyRef:

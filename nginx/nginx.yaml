@@ -182,7 +182,7 @@ spec:
         path: /apply
         backend:
           service:
-            name: apply-nginx-svc
+            name: apply-fastapi-service
             port:
               number: 80
 
@@ -203,7 +203,7 @@ spec:
         path: /result
         backend:
           service:
-            name: result-nginx-svc
+            name: result-fastapi-service
             port:
               number: 80
 
@@ -223,6 +223,6 @@ spec:
         path: /schedule
         backend:
           service:
-            name: schedule-nginx-svc
+            name: schedule-fastapi-service
             port:
               number: 80
