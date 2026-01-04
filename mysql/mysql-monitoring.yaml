@@ -2,11 +2,16 @@
 apiVersion: v1
 kind: Secret
 metadata:
-  name: mysql-export-secret
+  name: mysql-exporter-secret
   namespace: db
 type: Opaque
 stringData:
-  datasource: "monitoring:1234@(mysql-cluster.db:3306)/"
+  my-cnf: |
+    [client]
+    user=monitoring
+    password=1234
+    host=mysql-cluster.db
+    port=3306
 
 ---
 # Deploy
@@ -30,15 +35,19 @@ spec:
       containers:
       - name: mysql-exporter
         image: prom/mysqld-exporter:v0.15.0
-        env:
-        - name: DATA_SOURCE_NAME
-          valueFrom:
-            secretKeyRef:
-              name: mysql-export-secret
-              key: datasource
+        args:
+        - "--config.my-cnf=/etc/mysql-exporter/my-cnf"
         ports:
         - containerPort: 9104
           name: metrics
+        volumeMounts:
+        - name: config-volume
+          mountPath: /etc/mysql-exporter
+          readOnly: true
+      volumes:
+      - name: config-volume
+        secret:
+          secretName: mysql-exporter-secret
 
 ---
 # Service
