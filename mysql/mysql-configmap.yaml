@@ -13,7 +13,7 @@ data:
     GRANT PROCESS, REPLICATION CLIENT, SELECT ON *.* TO 'monitoring'@'%';
     FLUSH PRIVILEGES;
 
-    CREATE DATABASE IF NOT EXISTS exam;
+    CREATE DATABASE IF NOT EXISTS exam CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
     USE exam;
 
@@ -29,7 +29,7 @@ data:
         result_end_date DATE NOT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-    );
+    ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
     INSERT IGNORE INTO exam_info (category, cert_name, regist_start_date, regist_end_date, exam_start_date, exam_end_date, result_start_date, result_end_date)
     VALUES
@@ -56,7 +56,7 @@ data:
     ('CI/CD', 'AWS-DevOps', '2026-03-05', '2026-03-12', '2026-03-15', '2026-03-20', '2026-03-25', '2026-03-30');
 
 
-    CREATE DATABASE IF NOT EXISTS candidate;
+    CREATE DATABASE IF NOT EXISTS candidate CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
     USE candidate;
 
     CREATE TABLE IF NOT EXISTS candidate_info (
@@ -66,5 +66,5 @@ data:
         exam_category VARCHAR(50) NOT NULL,
         exam_name   VARCHAR(100)    NOT NULL,
         result      VARCHAR(10)
-    );
+    )CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
                                                           
