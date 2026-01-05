@@ -48,6 +48,7 @@ def get_categories():
         finally:
             conn.close()
     except Exception as e:
+        print(f"Error in get_categories: {e}")
         return JSONResponse(status_code=500, content={"error": str(e)})
 
 # 2️⃣ 카테고리별 자격증 목록
@@ -62,6 +63,7 @@ def get_exams(category: str):
         finally:
             conn.close()
     except Exception as e:
+        print(f"Error in get_exams: {e}")
         return JSONResponse(status_code=500, content={"error": str(e)})
 
 # 3️⃣ 신청 처리
@@ -79,6 +81,7 @@ def apply_exam(category: str = Form(...), exam_name: str = Form(...), name: str 
             conn.close()
         return JSONResponse({"status": "success", "category": category, "exam_name": exam_name, "name": name})
     except Exception as e:
+        print(f"Error in apply_exam: {e}")
         return JSONResponse(status_code=500, content={"error": str(e)})
 
 # 시험 일정 HTML 페이지
@@ -108,6 +111,7 @@ def get_exam_schedule(category: str, exam_name: str):
             "result_date": f'{row["result_start_date"]} ~ {row["result_end_date"]}'
         }
     except Exception as e:
+        print(f"Error in get_exam_scheduel: {e}")
         return JSONResponse(status_code=500, content={"error": str(e)})
 
 @app.get("/result", response_class=HTMLResponse)
@@ -134,6 +138,7 @@ def get_result(category: str, exam_name: str, name: str, birth: str):
         msg = "합격하셨습니다." if res_val == "P" else "불합격하셨습니다." if res_val == "F" else "결과 처리 중"
         return {"name": row["name"], "category": row["exam_category"], "exam_name": row["exam_name"], "result": msg}
     except Exception as e:
+        print(f"Error in get_result: {e}")
         return JSONResponse(status_code=500, content={"error": str(e)})
 
 # --- Admin Service 추가 ---
@@ -155,6 +160,7 @@ def search_candidates(name: str):
         finally:
             conn.close()
     except Exception as e:
+        print(f"Error in search_candidates: {e}")
         return JSONResponse(status_code=500, content={"error": str(e)})
 
 @app.post("/admin/result")
@@ -168,4 +174,5 @@ def update_result(candidate_id: int = Form(...), result: str = Form(...)):
             conn.close()
         return JSONResponse({"status": "success"})
     except Exception as e:
+        print(f"Error in update_result: {e}")
         return JSONResponse(status_code=500, content={"error": str(e)})

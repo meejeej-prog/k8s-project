@@ -139,7 +139,7 @@ document.getElementById('check-result').addEventListener('click', async function
         if (data.result === "P") msg = "합격하셨습니다.";
         else if (data.result === "F") msg = "불합격하셨습니다.";
 
-        resultDiv.innerHTML = `<p><strong>시험 결과:</strong> ${msg}</p>`;
+        resultDiv.innerHTML = `<p><strong>시험 결과:</strong> ${data.result}</p>`;
     }
 });
 </script>
