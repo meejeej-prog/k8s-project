@@ -1,177 +1,95 @@
-# Deploy
-#
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: apply-fastapi-deployment
   namespace: apply
-  labels:
-    app: apply-fastapi
 spec:
   replicas: 1
-  selector:
-    matchLabels:
-      app: apply-fastapi
+  selector: { matchLabels: { app: apply-fastapi } }
   template:
-    metadata:
-      labels:
-        app: apply-fastapi
+    metadata: { labels: { app: apply-fastapi } }
     spec:
       containers:
       - name: apply-fastapi
-<<<<<<< HEAD
-        image: jiwon888/fastapi:4.3
-=======
-        image: jiwon888/fastapi:6.0
->>>>>>> e2966b9
-        ports:
-        - containerPort: 8000
-        resources:
-          requests:
-            cpu: "200m"
-          limits:
-            cpu: "500m"
+        image: jiwon888/fastapi:6.1
+        ports: [{ containerPort: 8000 }]
         env:
         - name: MYSQL_HOST
           value: "mysql-cluster.db"
         - name: MYSQL_USER
-          valueFrom:
-            secretKeyRef:
-              name: secret
-              key: mysql-user-id
+          valueFrom: { secretKeyRef: { name: secret, key: mysql-user-id } }
         - name: MYSQL_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: secret
-              key: mysql-user-password
+          valueFrom: { secretKeyRef: { name: secret, key: mysql-user-password } }
         - name: MYSQL_DB_1
-          valueFrom:
-            secretKeyRef:
-              name: secret
-              key: mysql-database-1
+          valueFrom: { secretKeyRef: { name: secret, key: mysql-database-1 } }
         - name: MYSQL_DB_2
-          valueFrom:
-            secretKeyRef:
-              name: secret
-              key: mysql-database-2
+          valueFrom: { secretKeyRef: { name: secret, key: mysql-database-2 } }
         - name: MYSQL_PORT_RW
-          value: "3306"
+          value: "6446"
         - name: MYSQL_PORT_RO
-          value: "3306"
+          value: "6447"
 ---
-
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: schedule-fastapi-deployment
   namespace: schedule
-  labels:
-    app: schedule-fastapi
 spec:
   replicas: 1
-  selector:
-    matchLabels:
-      app: schedule-fastapi
+  selector: { matchLabels: { app: schedule-fastapi } }
   template:
-    metadata:
-      labels:
-        app: schedule-fastapi
+    metadata: { labels: { app: schedule-fastapi } }
     spec:
       containers:
       - name: schedule-fastapi
-<<<<<<< HEAD
-        image: jiwon888/fastapi:4.3
-=======
-        image: jiwon888/fastapi:6.0
->>>>>>> e2966b9
-        ports:
-        - containerPort: 8000
+        image: jiwon888/fastapi:6.1
+        ports: [{ containerPort: 8000 }]
         env:
         - name: MYSQL_HOST
           value: "mysql-cluster.db"
         - name: MYSQL_USER
-          valueFrom:
-            secretKeyRef:
-              name: secret
-              key: mysql-user-id
+          valueFrom: { secretKeyRef: { name: secret, key: mysql-user-id } }
         - name: MYSQL_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: secret
-              key: mysql-user-password
+          valueFrom: { secretKeyRef: { name: secret, key: mysql-user-password } }
         - name: MYSQL_DB_1
-          valueFrom:
-            secretKeyRef:
-              name: secret
-              key: mysql-database-1
+          valueFrom: { secretKeyRef: { name: secret, key: mysql-database-1 } }
         - name: MYSQL_DB_2
-          valueFrom:
-            secretKeyRef:
-              name: secret
-              key: mysql-database-2
+          valueFrom: { secretKeyRef: { name: secret, key: mysql-database-2 } }
         - name: MYSQL_PORT_RW
-          value: "3306"
+          value: "6446"
         - name: MYSQL_PORT_RO
-          value: "3306"
+          value: "6447"
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: result-fastapi-deployment
   namespace: result
-  labels:
-    app: result-fastapi
 spec:
   replicas: 1
-  selector:
-    matchLabels:
-      app: result-fastapi
+  selector: { matchLabels: { app: result-fastapi } }
   template:
-    metadata:
-      labels:
-        app: result-fastapi
+    metadata: { labels: { app: result-fastapi } }
     spec:
       containers:
       - name: result-fastapi
-<<<<<<< HEAD
-        image: jiwon888/fastapi:4.3
-=======
-        image: jiwon888/fastapi:6.0
->>>>>>> e2966b9
-        ports:
-        - containerPort: 8000
-        resources:
-          requests:
-            cpu: "200m"
-          limits:
-            cpu: "500m"
+        image: jiwon888/fastapi:6.1
+        ports: [{ containerPort: 8000 }]
         env:
         - name: MYSQL_HOST
           value: "mysql-cluster.db"
         - name: MYSQL_USER
-          valueFrom:
-            secretKeyRef:
-              name: secret
-              key: mysql-user-id
+          valueFrom: { secretKeyRef: { name: secret, key: mysql-user-id } }
         - name: MYSQL_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: secret
-              key: mysql-user-password
+          valueFrom: { secretKeyRef: { name: secret, key: mysql-user-password } }
         - name: MYSQL_DB_1
-          valueFrom:
-            secretKeyRef:
-              name: secret
-              key: mysql-database-1
+          valueFrom: { secretKeyRef: { name: secret, key: mysql-database-1 } }
         - name: MYSQL_DB_2
-          valueFrom:
-            secretKeyRef:
-              name: secret
-              key: mysql-database-2
+          valueFrom: { secretKeyRef: { name: secret, key: mysql-database-2 } }
         - name: MYSQL_PORT_RW
-          value: "3306"
+          value: "6446"
         - name: MYSQL_PORT_RO
-          value: "3306"
+          value: "6447"
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -180,159 +98,54 @@ metadata:
   namespace: admin
 spec:
   replicas: 1
-  selector:
-    matchLabels:
-      app: admin-fastapi
+  selector: { matchLabels: { app: admin-fastapi } }
   template:
-    metadata:
-      labels:
-        app: admin-fastapi
+    metadata: { labels: { app: admin-fastapi } }
     spec:
       containers:
       - name: admin-fastapi
-        image: jiwon888/fastapi:6.0
-        ports:
-        - containerPort: 8000
-        resources:
-          requests:
-            cpu: "200m"
-          limits:
-            cpu: "500m"
+        image: jiwon888/fastapi:6.1
+        ports: [{ containerPort: 8000 }]
         env:
         - name: MYSQL_HOST
           value: "mysql-cluster.db"
         - name: MYSQL_USER
-          valueFrom:
-            secretKeyRef:
-              name: secret
-              key: mysql-user-id
+          valueFrom: { secretKeyRef: { name: secret, key: mysql-user-id } }
         - name: MYSQL_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: secret
-              key: mysql-user-password
+          valueFrom: { secretKeyRef: { name: secret, key: mysql-user-password } }
         - name: MYSQL_DB_1
-          valueFrom:
-            secretKeyRef:
-              name: secret
-              key: mysql-database-1
+          valueFrom: { secretKeyRef: { name: secret, key: mysql-database-1 } }
         - name: MYSQL_DB_2
-         valueFrom:
-            secretKeyRef:
-              name: secret
-              key: mysql-database-2
+          valueFrom: { secretKeyRef: { name: secret, key: mysql-database-2 } }
         - name: MYSQL_PORT_RW
           value: "6446"
         - name: MYSQL_PORT_RO
           value: "6447"
-
 ---
-
-# Service
-
 apiVersion: v1
 kind: Service
-metadata:
-  name: apply-fastapi-service
-  namespace: apply
+metadata: { name: apply-fastapi-service, namespace: apply }
 spec:
-  selector:
-    app: apply-fastapi
-  ports:
-  - protocol: TCP
-    port: 80
-    targetPort: 8000
-  type: ClusterIP
-
+  selector: { app: apply-fastapi }
+  ports: [{ port: 80, targetPort: 8000 }]
 ---
-
 apiVersion: v1
 kind: Service
-metadata:
-  name: schedule-fastapi-service
-  namespace: schedule
+metadata: { name: schedule-fastapi-service, namespace: schedule }
 spec:
-  selector:
-    app: schedule-fastapi
-  ports:
-  - protocol: TCP
-    port: 80
-    targetPort: 8000
-  type: ClusterIP
-
+  selector: { app: schedule-fastapi }
+  ports: [{ port: 80, targetPort: 8000 }]
 ---
-
 apiVersion: v1
 kind: Service
-metadata:
-  name: result-fastapi-service
-  namespace: result
+metadata: { name: result-fastapi-service, namespace: result }
 spec:
-  selector:
-    app: result-fastapi
-  ports:
-  - protocol: TCP
-    port: 80
-    targetPort: 8000
-  type: ClusterIP
-
+  selector: { app: result-fastapi }
+  ports: [{ port: 80, targetPort: 8000 }]
 ---
-
 apiVersion: v1
 kind: Service
-metadata:
-  name: admin-fastapi-service
-  namespace: admin
+metadata: { name: admin-fastapi-service, namespace: admin }
 spec:
-  selector:
-    app: admin-fastapi
-  ports:
-  - protocol: TCP
-    port: 80
-    targetPort: 8000
-
-
----
-# HPA
-
-apiVersion: autoscaling/v2
-kind: HorizontalPodAutoscaler
-metadata:
-  name: apply-fastapi-hpa
-  namespace: apply
-spec:
-  scaleTargetRef:
-    apiVersion: apps/v1
-    kind: Deployment
-    name: apply-fastapi-deployment
-  minReplicas: 1
-  maxReplicas: 10
-  metrics:
-   - type: Resource
-     resource:
-       name: cpu
-       target:
-         type: Utilization
-         averageUtilization: 50
-
----
-apiVersion: autoscaling/v2
-kind: HorizontalPodAutoscaler
-metadata:
-  name: result-fastapi-hpa
-  namespace: result
-spec:
-  scaleTargetRef:
-    apiVersion: apps/v1
-    kind: Deployment
-    name: result-fastapi-deployment
-  minReplicas: 1
-  maxReplicas: 5
-  metrics:
-  - type: Resource
-    resource:
-      name: cpu
-      target:
-        type: Utilization
-        averageUtilization: 50
-
+  selector: { app: admin-fastapi }
+  ports: [{ port: 80, targetPort: 8000 }]
