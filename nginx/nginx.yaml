@@ -161,10 +161,12 @@ spec:
   externalName: admin-fastapi-service.admin.svc.cluster.local
 ---
 # Ingress
+#
+# 1. Client 용 Ingress
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: nginx-ingress-main
+  name: public-ingress
   namespace: main
 spec:
   ingressClassName: nginx
@@ -203,6 +205,21 @@ spec:
             port:
               number: 80
 
+---
+# 2. Admin 용 Ingress
+
+apiVersion : networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: admin-ingress
+  namespace: main
+  annotations: 
+    nginx.ingress.kubernetes.io/whitelist-source-range: "172.100.100.13/32"
+spec:
+  ingressClassName: nginx
+  rules:
+  - http:
+      paths:
       - pathType: Prefix
         path: /admin
         backend:
@@ -210,3 +227,4 @@ spec:
             name: admin-external-svc
             port:
               number: 80
+
