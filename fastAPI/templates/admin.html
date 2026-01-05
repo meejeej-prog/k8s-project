@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>관리자 - 시험 결과 입력</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { margin: 0; font-family: Arial, Helvetica, sans-serif; background-color: #f5f7fa; color: #333; }
+        header { background-color: #dc2626; color: white; padding: 20px; text-align: center; }
+        main { max-width: 800px; margin: 40px auto; background-color: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.08); }
+        h2 { text-align: center; margin-bottom: 30px; }
+        label { display: block; margin-top: 15px; font-weight: bold; }
+        input, select { width: 100%; padding: 10px; margin-top: 5px; border-radius: 6px; border: 1px solid #ccc; box-sizing: border-box; }
+        button { margin-top: 20px; width: 100%; padding: 12px; background-color: #dc2626; color: white; border: none; border-radius: 6px; font-size: 16px; cursor: pointer; }
+        button:hover { background-color: #b91c1c; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+        th { background-color: #f3f4f6; }
+        .result-select { width: 80px; padding: 5px; }
+        .save-btn { width: auto; padding: 5px 10px; font-size: 14px; margin-top: 0; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>관리자 페이지 (시험 결과 입력)</h1>
+</header>
+
+<main>
+    <h2>수험생 검색</h2>
+    <div style="display: flex; gap: 10px;">
+        <input type="text" id="search-name" placeholder="이름을 입력하세요">
+        <button onclick="searchCandidates()" style="width: 100px; margin-top: 5px;">검색</button>
+    </div>
+    
+    <table id="candidate-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>이름</th>
+                <th>생년월일</th>
+                <th>시험명</th>
+                <th>현재 결과</th>
+                <th>결과 입력</th>
+                <th>저장</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td colspan="7">이름을 검색하세요.</td>
+            </tr>
+        </tbody>
+    </table>
+</main>
+
+<script>
+async function searchCandidates() {
+    const name = document.getElementById('search-name').value;
+    if (!name) {
+        alert("이름을 입력해주세요.");
+        return;
+    }
+    
+    const res = await fetch(`/admin/candidates?name=${name}`);
+    const data = await res.json();
+    const tbody = document.querySelector('#candidate-table tbody');
+    tbody.innerHTML = '';
+    
+    if (data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7">검색 결과가 없습니다.</td></tr>';
+        return;
+    }
+    
+    data.forEach(c => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>${c.candidate_id}</td>
+            <td>${c.name}</td>
+            <td>${c.birth}</td>
+            <td>${c.exam_name}</td>
+            <td>${c.result || '-'}</td>
+            <td>
+                <select class="result-select" id="result-${c.candidate_id}">
+                    <option value="P" ${c.result === 'P' ? 'selected' : ''}>합격</option>
+                    <option value="F" ${c.result === 'F' ? 'selected' : ''}>불합격</option>
+                </select>
+            </td>
+            <td>
+                <button class="save-btn" onclick="saveResult(${c.candidate_id})">저장</button>
+            </td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+async function saveResult(id) {
+    const result = document.getElementById(`result-${id}`).value;
+    const formData = new FormData();
+    formData.append('candidate_id', id);
+    formData.append('result', result);
+    
+    const res = await fetch('/admin/result', {
+        method: 'POST',
+        body: formData
+    });
+    const data = await res.json();
+    
+    if (data.status === 'success') {
+        alert("저장되었습니다.");
+        searchCandidates(); // 목록 갱신
+    } else {
+        alert("저장 실패: " + data.error);
+    }
+}
+</script>
+
+</body>
+</html>

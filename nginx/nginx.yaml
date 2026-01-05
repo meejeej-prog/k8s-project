@@ -87,6 +87,28 @@ spec:
         ports:
         - containerPort: 80
 ---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: admin-nginx
+  namespace: admin
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: admin-nginx
+  template:
+    metadata:
+      labels:
+        app: admin-nginx
+    spec:
+      containers:
+      - name: admin-nginx
+        image: nginx:1.29.3-alpine
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 80
+---
 # Service
 apiVersion: v1
 kind: Service
@@ -129,6 +151,15 @@ spec:
   type: ExternalName
   externalName: schedule-fastapi-service.schedule.svc.cluster.local
 ---
+apiVersion: v1
+kind: Service
+metadata:
+  name: admin-external-svc
+  namespace: main
+spec:
+  type: ExternalName
+  externalName: admin-fastapi-service.admin.svc.cluster.local
+---
 # Ingress
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -169,5 +200,13 @@ spec:
         backend:
           service:
             name: schedule-external-svc
+            port:
+              number: 80
+
+      - pathType: Prefix
+        path: /admin
+        backend:
+          service:
+            name: admin-external-svc
             port:
               number: 80
