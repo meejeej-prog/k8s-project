@@ -20,14 +20,18 @@ MYSQL_PORT_RW = int(os.environ.get("MYSQL_PORT_RW", 6446))
 MYSQL_PORT_RO = int(os.environ.get("MYSQL_PORT_RO", 6447))
 
 # DB 선언
-exam_conn = pymysql.connect(
-    host=MYSQL_HOST,
-    port=MYSQL_PORT_RO,
-    user=MYSQL_USER,
-    password=MYSQL_PASSWORD,
-    database=MYSQL_DB_1,
-    cursorclass=pymysql.cursors.DictCursor
-)
+def get_db_conn(db_name, port):
+    return pymysql.connect(
+        host=MYSQL_HOST,
+        port=MYSQL_PORT_RO,
+        user=MYSQL_USER,
+        password=MYSQL_PASSWORD,
+        database=MYSQL_DB_1,
+        cursorclass=pymysql.cursors.DictCursor
+        autocommit=True,
+        charset='utf8mb4',
+        connect_timeout=5
+    )
 
 candidate_conn = pymysql.connect(
     host=MYSQL_HOST,
@@ -39,7 +43,7 @@ candidate_conn = pymysql.connect(
 )
 
 # 1️⃣ 카테고리 목록
-@app.get("/apply",response_class=HTMLResponse)
+@app.get("/apply", response_class=HTMLResponse)
 def serve_apply(request: Request):
     return templates.TemplateResponse(
             "apply.html",
@@ -47,9 +51,17 @@ def serve_apply(request: Request):
             )
 @app.get("/apply/categories")
 def get_categories():
-    with exam_conn.cursor() as cursor:
-        cursor.execute("SELECT DISTINCT category FROM exam_info")
-        return [row["category"] for row in cursor.fetchall()]
+    try:
+        conn=get_db_conn(MYSQL_DB_1, MYSQL_PORT_RO)
+        try:
+            with exam_conn.cursor() as cursor:
+                return [row["category"] for row in cursor.fetchall()]
+
+        finally:
+            conn.close()
+    except Exception as e:
+        print(f"Error in get_categories: {e}")
+        return JSONResponse(status_code=500, content={"error": str(e)})
 
 # 2️⃣ 카테고리별 자격증 목록
 @app.get("/apply/exams")
