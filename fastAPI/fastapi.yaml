@@ -19,7 +19,11 @@ spec:
     spec:
       containers:
       - name: apply-fastapi
+<<<<<<< HEAD
         image: jiwon888/fastapi:4.3
+=======
+        image: jiwon888/fastapi:6.0
+>>>>>>> e2966b9
         ports:
         - containerPort: 8000
         resources:
@@ -75,7 +79,11 @@ spec:
     spec:
       containers:
       - name: schedule-fastapi
+<<<<<<< HEAD
         image: jiwon888/fastapi:4.3
+=======
+        image: jiwon888/fastapi:6.0
+>>>>>>> e2966b9
         ports:
         - containerPort: 8000
         env:
@@ -125,7 +133,11 @@ spec:
     spec:
       containers:
       - name: result-fastapi
+<<<<<<< HEAD
         image: jiwon888/fastapi:4.3
+=======
+        image: jiwon888/fastapi:6.0
+>>>>>>> e2966b9
         ports:
         - containerPort: 8000
         resources:
@@ -160,6 +172,60 @@ spec:
           value: "3306"
         - name: MYSQL_PORT_RO
           value: "3306"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: admin-fastapi-deployment
+  namespace: admin
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: admin-fastapi
+  template:
+    metadata:
+      labels:
+        app: admin-fastapi
+    spec:
+      containers:
+      - name: admin-fastapi
+        image: jiwon888/fastapi:6.0
+        ports:
+        - containerPort: 8000
+        resources:
+          requests:
+            cpu: "200m"
+          limits:
+            cpu: "500m"
+        env:
+        - name: MYSQL_HOST
+          value: "mysql-cluster.db"
+        - name: MYSQL_USER
+          valueFrom:
+            secretKeyRef:
+              name: secret
+              key: mysql-user-id
+        - name: MYSQL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: secret
+              key: mysql-user-password
+        - name: MYSQL_DB_1
+          valueFrom:
+            secretKeyRef:
+              name: secret
+              key: mysql-database-1
+        - name: MYSQL_DB_2
+         valueFrom:
+            secretKeyRef:
+              name: secret
+              key: mysql-database-2
+        - name: MYSQL_PORT_RW
+          value: "6446"
+        - name: MYSQL_PORT_RO
+          value: "6447"
+
 ---
 
 # Service
@@ -209,6 +275,22 @@ spec:
     port: 80
     targetPort: 8000
   type: ClusterIP
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: admin-fastapi-service
+  namespace: admin
+spec:
+  selector:
+    app: admin-fastapi
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8000
+
 
 ---
 # HPA
