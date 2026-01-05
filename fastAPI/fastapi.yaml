@@ -11,7 +11,7 @@ spec:
     spec:
       containers:
       - name: apply-fastapi
-        image: jiwon888/fastapi:6.1
+        image: jiwon888/fastapi:6.2
         ports: [{ containerPort: 8000 }]
         env:
         - name: MYSQL_HOST
@@ -42,7 +42,7 @@ spec:
     spec:
       containers:
       - name: schedule-fastapi
-        image: jiwon888/fastapi:6.1
+        image: jiwon888/fastapi:6.2
         ports: [{ containerPort: 8000 }]
         env:
         - name: MYSQL_HOST
@@ -73,7 +73,7 @@ spec:
     spec:
       containers:
       - name: result-fastapi
-        image: jiwon888/fastapi:6.1
+        image: jiwon888/fastapi:6.2
         ports: [{ containerPort: 8000 }]
         env:
         - name: MYSQL_HOST
@@ -104,7 +104,7 @@ spec:
     spec:
       containers:
       - name: admin-fastapi
-        image: jiwon888/fastapi:6.1
+        image: jiwon888/fastapi:6.2
         ports: [{ containerPort: 8000 }]
         env:
         - name: MYSQL_HOST
