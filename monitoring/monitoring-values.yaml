@@ -1,0 +1,20 @@
+grafana:
+  enabled: true
+  service:
+    type: LoadBalancer
+  adminPassword: "1234"
+  additionalDataSources:
+    - name: Loki
+      type: loki
+      url: http://loki.monitoring.svc.cluster.local:3100
+      access: proxy
+      isDefault: false
+
+prometheus:
+  prometheusSpec:
+    serviceMonitorSelectorNilUsesHelmValues: false
+  service:
+    type: LoadBalancer
+
+nodeExporter:
+  enabled: true
