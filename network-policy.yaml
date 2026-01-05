@@ -1,0 +1,139 @@
+# DB NameSpace Policy
+
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: mysql-isolation
+  namespace: db
+spec:
+  podSelector: {} # namespace db 상 모드 pod 대상
+  policyTypes:
+  - Ingress
+  ingress:
+    # FastAPI 파드로부터의 접속 허용
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: apply
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: result
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: schedule
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: admin
+    # Bastion Host로 부터의 접속 허용
+    - ipBlock:
+        cidr: 172.100.100.13/32
+    ports:
+    - protocol: TCP
+      port: 3306
+    - protocol: TCP
+      port: 6646
+    - protocol: TCP
+      port: 6447
+
+
+---
+# App NameSpace Policy
+#
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: apply-isolation
+  namespace: apply
+spec:
+  podSelector: {}
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          kubernetets.io/metadata.name: main
+  # Bastion Host로 부터 접속 허용
+    - ipBlock:
+        cidr: 172.100.100.13/32
+    ports:
+    - protocol: TCP
+      port: 80
+    - protocol: TCP
+      port: 8000
+
+---
+
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: result-isolation
+  namespace: result
+spec:
+  podSelector: {}
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          kubernetets.io/metadata.name: main
+  # Bastion Host로 부터 접속 허용
+    - ipBlock:
+        cidr: 172.100.100.13/32
+    ports:
+    - protocol: TCP
+      port: 80
+    - protocol: TCP
+      port: 8000
+
+---
+
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: schedule-isolation
+  namespace: schedule
+spec:
+  podSelector: {}
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          kubernetets.io/metadata.name: main
+  # Bastion Host로 부터 접속 허용
+    - ipBlock:
+        cidr: 172.100.100.13/32
+    ports:
+    - protocol: TCP
+      port: 80
+    - protocol: TCP
+      port: 8000
+
+
+---
+
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: admin-isolation
+  namespace: admin
+spec:
+  podSelector: {}
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          kubernetets.io/metadata.name: main
+  # Bastion Host로 부터 접속 허용
+    - ipBlock:
+        cidr: 172.100.100.13/32
+    ports:
+    - protocol: TCP
+      port: 80
+    - protocol: TCP
+      port: 8000
