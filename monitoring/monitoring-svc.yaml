@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: grafana-proxy-svc
+  name: grafana-external-svc
   namespace: main
 spec:
   type: ExternalName
@@ -15,7 +15,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: argocd-proxy-svc
+  name: argocd-external-svc
   namespace: main
 spec:
   type: ExternalName
