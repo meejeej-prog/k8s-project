@@ -214,7 +214,7 @@ metadata:
   name: admin-ingress
   namespace: main
   annotations: 
-    nginx.ingress.kubernetes.io/whitelist-source-range: "172.100.100.13/32"
+    nginx.ingress.kubernetes.io/whitelist-source-range: "10.100.0.1/32"
 spec:
   ingressClassName: nginx
   rules:

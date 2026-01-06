@@ -1,0 +1,7 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: manual
+provisioner: kubernetes.io/no-provisioner # 수동으로 PV를 연결할 때 사용
+reclaimPolicy: Retain
+volumeBindingMode: WaitForFirstConsumer # 포드가 생성될 때까지 바인딩을 대기
