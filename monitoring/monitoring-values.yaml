@@ -1,7 +1,12 @@
 grafana:
   enabled: true
+  adminPassword: "1234"
+  grafana.ini:
+    "server":
+      root_url: "%(protocol)s://%(domain)s/grafana/"
+      serve_from_sub_path: true
   service:
-    type: LoadBalancer
+    type: ClusterIP
   adminPassword: "1234"
   additionalDataSources:
     - name: Loki
@@ -9,12 +14,11 @@ grafana:
       url: http://loki.monitoring.svc.cluster.local:3100
       access: proxy
       isDefault: false
-
 prometheus:
   prometheusSpec:
     serviceMonitorSelectorNilUsesHelmValues: false
   service:
-    type: LoadBalancer
+    type: ClusterIP
 
 nodeExporter:
   enabled: true
