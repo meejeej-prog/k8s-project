@@ -40,6 +40,8 @@ spec:
       port: 6646
     - protocol: TCP
       port: 6447
+    - protocol: TCP
+      port: 33060
 
 
 ---
@@ -101,6 +103,10 @@ spec:
     - namespaceSelector:
         matchLabels:
           kubernetes.io/metadata.name: ingress-nginx
+    # Apply에서 접근 가능
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: apply
     - ipBlock:
         cidr: 172.100.100.13/32
     ports:
@@ -159,14 +165,14 @@ spec:
     # main에서 접근 가능
     - namespaceSelector:
         matchLabels:
-          kubernetets.io/metadata.name: main
+          kubernetes.io/metadata.name: main
     # admin에서 내부 통신 허용
     - namespaceSelector:
         matchLabels:
-          kubernetets.io/metadata.name: admin
+          kubernetes.io/metadata.name: admin
     - namespaceSelector:
         matchLabels:
-          kubernetets.io/metadata.name: ingress-nginx
+          kubernetes.io/metadata.name: ingress-nginx
   # Bastion Host로 부터 접속 허용
     - ipBlock:
         cidr: 172.100.100.13/32
