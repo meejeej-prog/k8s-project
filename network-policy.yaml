@@ -24,6 +24,12 @@ spec:
     - namespaceSelector:
         matchLabels:
           kubernetes.io/metadata.name: admin
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: mysql-operator
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: db
     # Bastion Host로 부터의 접속 허용
     - ipBlock:
         cidr: 172.100.100.13/32
@@ -50,10 +56,18 @@ spec:
   - Ingress
   ingress:
   - from:
+    # main에서 접근 가능
     - namespaceSelector:
         matchLabels:
-          kubernetets.io/metadata.name: main
-  # Bastion Host로 부터 접속 허용
+          kubernetes.io/metadata.name: main
+    # apply에서 내부 통신 허용 
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: apply
+    # Ingress Controller (외부 트래픽) 허용
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: ingress-nginx
     - ipBlock:
         cidr: 172.100.100.13/32
     ports:
@@ -75,10 +89,18 @@ spec:
   - Ingress
   ingress:
   - from:
+    # main에서 접근 가능
     - namespaceSelector:
         matchLabels:
-          kubernetets.io/metadata.name: main
-  # Bastion Host로 부터 접속 허용
+          kubernetes.io/metadata.name: main
+    # result에서 내부 통신 허용 
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: result
+    # Ingress Controller (외부 트래픽) 허용
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: ingress-nginx
     - ipBlock:
         cidr: 172.100.100.13/32
     ports:
@@ -100,10 +122,18 @@ spec:
   - Ingress
   ingress:
   - from:
+    # main에서 접근 가능
     - namespaceSelector:
         matchLabels:
-          kubernetets.io/metadata.name: main
-  # Bastion Host로 부터 접속 허용
+          kubernetes.io/metadata.name: main
+    # schedule에서 내부 통신 허용
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: schedule
+    # Ingress Controller (외부 트래픽) 허용
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: ingress-nginx
     - ipBlock:
         cidr: 172.100.100.13/32
     ports:
@@ -126,9 +156,17 @@ spec:
   - Ingress
   ingress:
   - from:
+    # main에서 접근 가능
     - namespaceSelector:
         matchLabels:
           kubernetets.io/metadata.name: main
+    # admin에서 내부 통신 허용
+    - namespaceSelector:
+        matchLabels:
+          kubernetets.io/metadata.name: admin
+    - namespaceSelector:
+        matchLabels:
+          kubernetets.io/metadata.name: ingress-nginx
   # Bastion Host로 부터 접속 허용
     - ipBlock:
         cidr: 172.100.100.13/32

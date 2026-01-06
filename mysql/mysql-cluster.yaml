@@ -9,9 +9,24 @@ spec:
   router:
     instances: 1 # Router 1개
   tlsUseSelfSigned: true
+  mycnf: |
+    [mysqld]
+    loose-group_replication_member_expel_timeout=60
+    loose-group_replication_autorejoin_tries=3
+    connect_timeout=30
+    innodb_lock_wait_timeout=100
+
   podSpec:
     containers:
     - name: mysql
+      resources:
+        requests:
+          cpu: "500m"
+          memory: "1G"
+        limits:
+          cpu: "1"
+          memory: "2G"
+
       # [수정] postStart 훅 제거: NFS 지연 시 파드 사망 방지 및 초기화 Job으로 기능 분리
       startupProbe:
         exec:
