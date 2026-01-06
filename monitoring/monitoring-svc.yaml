@@ -1,0 +1,23 @@
+# Grafana를 monitoring-ingress 네임 스페이스로 끌어옴
+apiVersion: v1
+kind: Service
+metadata:
+  name: grafana-proxy-svc
+  namespace: main
+spec:
+  type: ExternalName
+  externalName: prometheus-stack-grafana.monitoring.svc.cluster.local
+
+
+
+---
+# ArgoCD를 monitoring-ingress 네임 스페이스로 끌어옴
+apiVersion: v1
+kind: Service
+metadata:
+  name: argocd-proxy-svc
+  namespace: main
+spec:
+  type: ExternalName
+  externalName: argocd-server.argocd.svc.cluster.local
+
