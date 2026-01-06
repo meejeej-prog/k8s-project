@@ -79,7 +79,7 @@ def apply_exam(category: str = Form(...), exam_name: str = Form(...), name: str 
                 )
         finally:
             conn.close()
-        return JSONResponse({"status": "success", "category": category, "exam_name": exam_name, "name": name})
+        return JSONResponse({"status": "success", "category": category, "exam_name": exam_name, "name": name, "birthdate": birthdate})
     except Exception as e:
         print(f"Error in apply_exam: {e}")
         return JSONResponse(status_code=500, content={"error": str(e)})

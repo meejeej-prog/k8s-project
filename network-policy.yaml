@@ -10,34 +10,27 @@ spec:
   policyTypes:
   - Ingress
   ingress:
-    # FastAPI 파드로부터의 접속 허용
-  - from:
-    - namespaceSelector:
-        matchLabels:
-          kubernetes.io/metadata.name: apply
-    - namespaceSelector:
-        matchLabels:
-          kubernetes.io/metadata.name: result
-    - namespaceSelector:
-        matchLabels:
-          kubernetes.io/metadata.name: schedule
-    - namespaceSelector:
-        matchLabels:
-          kubernetes.io/metadata.name: admin
-    - namespaceSelector:
-        matchLabels:
-          kubernetes.io/metadata.name: mysql-operator
-    - namespaceSelector:
-        matchLabels:
-          kubernetes.io/metadata.name: db
+    - from :
+      - namespaceSelector: {}
+        podSelector:
+          matchLabels:
+            - key: app
+              operator: In
+              values: [apply-fastapi, result-fastapi, schedule-fastapi, admin-fastapi]
+      - namespaceSelector:
+          matchLabels:
+            kubernetes.io/metadata.name: db
+      - namespaceSelector:
+          matchLabels:
+            kubernetes.io/metadata.name: mysql-operator
     # Bastion Host로 부터의 접속 허용
-    - ipBlock:
-        cidr: 172.100.100.13/32
+      - ipBlock:
+          cidr: 172.100.100.13/32
     ports:
     - protocol: TCP
       port: 3306
     - protocol: TCP
-      port: 6646
+      port: 6446
     - protocol: TCP
       port: 6447
     - protocol: TCP
