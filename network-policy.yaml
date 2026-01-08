@@ -12,30 +12,6 @@ spec:
   ingress:
     - from :
       - namespaceSelector: {}
-        podSelector:
-          matchLabels:
-            - key: app
-              operator: In
-              values: [apply-fastapi, result-fastapi, schedule-fastapi, admin-fastapi]
-      - namespaceSelector:
-          matchLabels:
-            kubernetes.io/metadata.name: db
-      - namespaceSelector:
-          matchLabels:
-            kubernetes.io/metadata.name: mysql-operator
-    # Bastion Host로 부터의 접속 허용
-      - ipBlock:
-          cidr: 172.100.100.13/32
-    ports:
-    - protocol: TCP
-      port: 3306
-    - protocol: TCP
-      port: 6446
-    - protocol: TCP
-      port: 6447
-    - protocol: TCP
-      port: 33060
-
 
 ---
 # App NameSpace Policy
@@ -158,7 +134,7 @@ spec:
     # main에서 접근 가능
     - namespaceSelector:
         matchLabels:
-          kubernetes.io/metadata.name: main
+          kubernetes.io/metadata.name: admin-main
     # admin에서 내부 통신 허용
     - namespaceSelector:
         matchLabels:
