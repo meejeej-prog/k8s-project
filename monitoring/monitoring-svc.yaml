@@ -3,7 +3,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: grafana-external-svc
-  namespace: main
+  namespace: admin-main
 spec:
   type: ExternalName
   externalName: prometheus-stack-grafana.monitoring.svc.cluster.local
@@ -16,7 +16,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: argocd-external-svc
-  namespace: main
+  namespace: admin-main
 spec:
   type: ExternalName
   externalName: argocd-server.argocd.svc.cluster.local

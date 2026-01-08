@@ -28,6 +28,13 @@ spec:
           value: "6446"
         - name: MYSQL_PORT_RO
           value: "6447"
+        resources:
+          requests:
+            cpu: "200m" # 최소 200m가 있는 Node에 배치하겠다
+            memory: "256Mi"
+          limits:
+            cpu: "500m" # 아무리 바빠도 Node 자원의 500m 이상 사용하지 마
+            memory: "512Mi"
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -59,6 +66,13 @@ spec:
           value: "6446"
         - name: MYSQL_PORT_RO
           value: "6447"
+        resources:
+          requests:
+            cpu: "200m"
+            memory: "256Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -90,6 +104,13 @@ spec:
           value: "6446"
         - name: MYSQL_PORT_RO
           value: "6447"
+        resources:
+          requests:
+            cpu: "200m"
+            memory: "256Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -149,3 +170,78 @@ metadata: { name: admin-fastapi-service, namespace: admin }
 spec:
   selector: { app: admin-fastapi }
   ports: [{ port: 80, targetPort: 8000 }]
+
+
+---
+# HPA 설정
+
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: apply-fastapi-hpa
+  namespace: apply
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: apply-fastapi-deployment
+  minReplicas: 1
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 50
+
+---
+
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: schedule-fastapi-hpa
+  namespace: schedule
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: schedule-fastapi-deployment
+  minReplicas: 1
+  maxReplicas: 2
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 50 # Request 값 (200m)의 50% (100m) 이상으로 CPU 사용량이 늘어나면 Pod 증가
+
+---
+
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: result-fastapi-hpa
+  namespace: result
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: result-fastapi-deployment
+  minReplicas: 1
+  maxReplicas: 8
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 50
+
+
+
+
+
+
+
